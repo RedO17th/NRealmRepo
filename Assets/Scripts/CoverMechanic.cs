@@ -10,9 +10,7 @@ public class CoverMechanic : BaseCellMechanic
 
     public override void Initialize(Component cell)
     {
-        
-
-
+        base.Initialize(cell);
     }
 
     private void OnMouseOver() => ProcessCover();
@@ -22,7 +20,7 @@ public class CoverMechanic : BaseCellMechanic
         {
             IsCover = true;
 
-            _item.Increase();
+            _item?.Increase();
         }
     }
 
@@ -33,7 +31,7 @@ public class CoverMechanic : BaseCellMechanic
         {
             IsCover = false;
 
-            _item.Decrease();
+            _item?.Decrease();
         }
     }
 
