@@ -7,7 +7,8 @@ public enum CellState { None = -1, Blocked, Free, Busy }
 public class BaseCell : MonoBehaviour
 {
     [SerializeField] private MeshRenderer _meshRenderer;
-
+    [SerializeField] private BaseMechanic[] _mechanics;
+ 
     #region Public properties
     public CellState State { get; private set; } = CellState.None;
     public CellType Type { get; private set; } = CellType.None;
@@ -26,6 +27,19 @@ public class BaseCell : MonoBehaviour
     public void Initialize(FieldManager manager)
     {
         _fieldManager = manager;
+
+        InitializeMechanics();
+    }
+
+    private void InitializeMechanics()
+    {
+        foreach (var mechanic in _mechanics)
+            mechanic.Initialize(this);
+    }
+
+    public void PutIn(Transform container)
+    {
+        transform.parent = container;
     }
 
     public void SetState(CellState state) => State = state;

@@ -8,7 +8,10 @@ using Random = System.Random;
 public class FieldBuilder : MonoBehaviour
 {
     [SerializeField] private BaseCell _cellPrefab;
+    [SerializeField] private Transform _cellContainer;
+
     [SerializeField] private BaseItem _itemPrefab;
+    [SerializeField] private Transform _itemContainer;
     [Range(0.1f, 1f)]
     [SerializeField] private float _yOffsetPosition = 0.5f;
 
@@ -56,6 +59,7 @@ public class FieldBuilder : MonoBehaviour
             {
                 var cell = Instantiate(_cellPrefab);
                     cell.Initialize(_fieldManager);
+                    cell.PutIn(_cellContainer);
                     cell.SetMaterial(_emptyMaterial);
                     cell.SetPosition(new Vector3(x, 0f, y));
 
@@ -171,6 +175,7 @@ public class FieldBuilder : MonoBehaviour
                         cell.SetState(CellState.Busy);
 
                     var item = Instantiate(_itemPrefab);
+                        item.PutIn(_itemContainer);
                         item.SetType(_temporaryColorsByType[indexMaterial].Type);
                         item.SetMaterial(_temporaryColorsByType[indexMaterial].Color);
 
