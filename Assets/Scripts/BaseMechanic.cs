@@ -16,3 +16,13 @@ public class BaseCellMechanic : BaseMechanic
         _cell = entity as BaseCell;
     }
 }
+
+public class BaseItemMechanic : BaseMechanic
+{
+    protected BaseItem _item = null;
+
+    public override void Initialize(Component entity)
+    {
+        _item = entity as BaseItem;
+    }
+}

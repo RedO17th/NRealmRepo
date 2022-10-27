@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,77 +6,56 @@ using UnityEngine;
 public class BaseItem : MonoBehaviour, IScalable
 {
     [SerializeField] private MeshRenderer _meshRenderer;
+    [SerializeField] private BaseMechanic[] _mechanics;
 
-    public CellType Type = CellType.None;
+    public CellType Type { get; private set; } = CellType.None;
+    public float CurrentScale => transform.localScale.x;
 
-    public void PutIn(Transform container)
+    public event Action OnIncreaseEvent;
+    public event Action OnDecreaseEvent;
+
+    public void Initialize(CellType type, Material material, Transform container)
+    {
+        Type = type;
+
+        SetMaterial(material);
+        PutIn(container);
+
+        InitializeMechanics();
+    }
+
+    private void SetMaterial(Material material)
+    {
+        _meshRenderer.material = material;
+    }
+    
+    private void PutIn(Transform container)
     {
         transform.parent = container;
     }
-    public void SetType(CellType type)
+
+    private void InitializeMechanics()
     {
-        Type = type;
+        foreach (var mechanic in _mechanics)
+            mechanic.Initialize(this);
     }
+   
     public void SetPosition(Vector3 position)
     {
         transform.position = position;
     }
-    public void SetMaterial(Material material)
-    {
-        _meshRenderer.material = material;
-    }
 
-    public void Increase()
-    {
-        if (_scaleRoutine != null)
-            StopCoroutine(_scaleRoutine);
-
-        _scaleRoutine = StartCoroutine(ScaleRoutine(_maxScale, _timeToMaxScale));
-    }
-
-    public void Decrease()
-    {
-        if (_scaleRoutine != null)
-            StopCoroutine(_scaleRoutine);
-
-        _scaleRoutine = StartCoroutine(ScaleRoutine(_standartScale, _timeToMinScale));
-    }
-
-    private Coroutine _scaleRoutine = null;
-    private float _maxScale = 1.1f;
-    private float _standartScale = 1f;
-    private float _timeToMaxScale = 0.2f;
-    private float _timeToMinScale = 0.1f;
-
-    private IEnumerator ScaleRoutine(float targetScale, float executionTime)
-    {
-        float pastTime = 0;
-
-        var currentScale = transform.localScale.x;
-
-        while (pastTime <= executionTime)
-        {
-            var scale = Mathf.Lerp(currentScale, targetScale, pastTime / executionTime);
-            
-            transform.localScale = new Vector3(scale, 1f, scale);
-
-            pastTime += Time.deltaTime;
-
-            yield return null;
-        }
-
-        transform.localScale = new Vector3(targetScale, 1f, targetScale);
-        pastTime = 0;
-    }
-
-    private IEnumerator DecreaseRoutine()
-    {
-        yield return null;
-    }
+    public void Increase() => OnIncreaseEvent?.Invoke();
+    public void Decrease() => OnDecreaseEvent?.Invoke();
 }
 
 public interface IScalable
 {
+    event Action OnIncreaseEvent;
+    event Action OnDecreaseEvent;
+
+    float CurrentScale { get; }
+
     void Increase();
     void Decrease();
 }

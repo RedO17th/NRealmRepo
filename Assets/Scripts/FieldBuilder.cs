@@ -174,10 +174,11 @@ public class FieldBuilder : MonoBehaviour
                     var cell = _cells[i, j];
                         cell.SetState(CellState.Busy);
 
+                    var type = _temporaryColorsByType[indexMaterial].Type;
+                    var material = _temporaryColorsByType[indexMaterial].Color;
+
                     var item = Instantiate(_itemPrefab);
-                        item.PutIn(_itemContainer);
-                        item.SetType(_temporaryColorsByType[indexMaterial].Type);
-                        item.SetMaterial(_temporaryColorsByType[indexMaterial].Color);
+                        item.Initialize(type, material, _itemContainer);
 
                     cell.SetItem(item);
                     _gameCellSequence.Add(cell);
