@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,18 +9,23 @@ public class BaseCell : MonoBehaviour
 {
     [SerializeField] private MeshRenderer _meshRenderer;
     [SerializeField] private BaseMechanic[] _mechanics;
- 
+
+    //[TODO] Rename
+    public event Action OnSome;
+
     #region Public properties
     public CellState State { get; private set; } = CellState.None;
     public CellType Type { get; private set; } = CellType.None;
-    public CellType ItemType => Item.Type;
 
     public BaseItem Item { get; private set; } = null;
     public bool MatchesByType { get; private set; } = false;
 
     public Vector3 Position => transform.position;
+    public Material Material => _meshRenderer.material;
     public int X => (int)transform.position.x;
     public int Y => (int)transform.position.z;
+
+    public bool Choised = false;
     #endregion
 
     private FieldManager _fieldManager = null;
@@ -74,13 +80,23 @@ public class BaseCell : MonoBehaviour
         _meshRenderer.material = material;
     }
 
-    public Material GetMaterial() 
-    {
-        return _meshRenderer.material;
-    }
-
     private void OnMouseDown()
     {
+        if (Item && Choised == false)
+        {
+            Item.Increase();
+            Choised = true;
+        }
+
         _fieldManager.MoveItem(this);
+    }
+
+    //[TODO] Rename
+    public void SetEmptyState()
+    {
+        Choised = false;
+        Item.Decrease();
+
+        OnSome?.Invoke();
     }
 }

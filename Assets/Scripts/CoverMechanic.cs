@@ -8,9 +8,11 @@ public class CoverMechanic : BaseCellMechanic
 
     private IScalable _item => _cell.Item;
 
-    public override void Initialize(Component cell)
+    public override void Initialize(Component entity)
     {
-        base.Initialize(cell);
+        base.Initialize(entity);
+
+        _cell.OnSome += OnSomeMeth;
     }
 
     private void OnMouseOver() => ProcessCover();
@@ -18,6 +20,8 @@ public class CoverMechanic : BaseCellMechanic
     {
         if (IsCover == false)
         {
+            Debug.Log($"CoverMechanic.ProcessCover()");
+
             IsCover = true;
 
             _item?.Increase();
@@ -27,7 +31,7 @@ public class CoverMechanic : BaseCellMechanic
     private void OnMouseExit() => ProcessUnCover();
     private void ProcessUnCover()
     {
-        if (IsCover)
+        if (IsCover && _cell.Choised == false)
         {
             IsCover = false;
 
@@ -35,4 +39,10 @@ public class CoverMechanic : BaseCellMechanic
         }
     }
 
+    private void OnSomeMeth() => IsCover = false;
+    private void OnDisable()
+    {
+        if(_cell)
+            _cell.OnSome -= OnSomeMeth;
+    }
 }

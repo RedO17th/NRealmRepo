@@ -34,6 +34,7 @@ public class FieldBuilder : MonoBehaviour
     private List<ColorByType> _temporaryColorsByType = new List<ColorByType>();
     private List<BaseCell> _unPlayableTemporaryCells = new List<BaseCell>();
 
+    //[TODO] Translate to private
     public List<BaseCell> _gameCellSequence = new List<BaseCell>();
 
     public void Initialize(FieldManager manager)

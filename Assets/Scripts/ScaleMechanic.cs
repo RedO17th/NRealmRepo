@@ -29,6 +29,9 @@ public class ScaleMechanic : BaseItemMechanic
 
     private void Increase()
     {
+        if (_item.CurrentScale == _maxScale)
+            return;
+
         if (_scaleRoutine != null)
             StopCoroutine(_scaleRoutine);
 

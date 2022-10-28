@@ -57,6 +57,9 @@ public class FieldManager : MonoBehaviour
         _swapper.SetCells(fCell, sCell);
         _swapper.Swap();
 
+        fCell.SetEmptyState();
+        sCell.SetEmptyState();
+
         CheckGameSequence();
     }
 
@@ -175,8 +178,8 @@ public class BaseSwapperOfCells
 
     private void SwapColors()
     {
-        var firstMaterial = _firstCell.GetMaterial();
-        var secondMaterial = _secondCell.GetMaterial();
+        var firstMaterial = _firstCell.Material;
+        var secondMaterial = _secondCell.Material;
 
         _firstCell.SetMaterial(secondMaterial);
         _secondCell.SetMaterial(firstMaterial);
