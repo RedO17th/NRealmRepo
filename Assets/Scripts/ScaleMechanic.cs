@@ -14,7 +14,7 @@ public class ScaleMechanic : BaseItemMechanic
     [SerializeField] private float _timeToMinScale = 0.05f;
 
     private Coroutine _scaleRoutine = null;
-    
+
     private float _standartScale = 1f;
 
     public override void Initialize(Component entity)
@@ -29,9 +29,6 @@ public class ScaleMechanic : BaseItemMechanic
 
     private void Increase()
     {
-        if (_item.CurrentScale == _maxScale)
-            return;
-
         if (_scaleRoutine != null)
             StopCoroutine(_scaleRoutine);
 

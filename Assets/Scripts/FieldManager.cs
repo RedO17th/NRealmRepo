@@ -10,6 +10,9 @@ public class FieldManager : MonoBehaviour
 
     public FieldBuilder Builder { get; private set; }  = null;
 
+    public BaseCell FirstCell { get; protected set; } = null;
+    public BaseCell SecondCell { get; protected set; } = null;
+
     private BaseMovingRule _currentRule = null;
     private BaseSwapperOfCells _swapper = null;
 
@@ -31,9 +34,36 @@ public class FieldManager : MonoBehaviour
         _swapper = new BaseSwapperOfCells();
 
         _currentRule = _rulesByType[_typeOfMovementRule];
+        _currentRule.Initialize(this);
 
         Builder.Initialize(this);
         Builder.Build();
+    }
+
+    public void AddCell(BaseCell cell)
+    {
+        if (cell.State == CellState.Blocked)
+        {
+            ProcessCancelMovement();
+
+            return;
+        }
+
+        if (FirstCell == null)
+            FirstCell = cell;
+        else if (SecondCell == null)
+        {
+            SecondCell = cell;
+        }
+    }
+
+    private void ProcessCancelMovement()
+    {
+        FirstCell?.ClearState();
+        SecondCell?.ClearState();
+
+        FirstCell = null;
+        SecondCell = null;
     }
 
     public void MoveItem(BaseCell cell)
@@ -44,21 +74,29 @@ public class FieldManager : MonoBehaviour
 
     private bool IsTheRulesMet(BaseCell cell)
     {
-        return _currentRule.IsPair(cell) && _currentRule.IsPositionCorrect();
+        bool result = _currentRule.IsPair(cell) && _currentRule.IsPositionCorrect();
+
+        if (AreBothCellsPresentWithNegativeResult(result))
+            ProcessCancelMovement();
+
+        return result;
+    }
+
+    private bool AreBothCellsPresentWithNegativeResult(bool primaryResult)
+    {
+        return primaryResult == false && SecondCell != null;
     }
 
     private void MoveByRules()
     {
-        var fCell = _currentRule.FirstCell;
-        var sCell = _currentRule.SecondCell;
-
-        _currentRule.RemoveData();
-
-        _swapper.SetCells(fCell, sCell);
+        _swapper.SetCells(FirstCell, SecondCell);
         _swapper.Swap();
 
-        fCell.SetEmptyState();
-        sCell.SetEmptyState();
+        FirstCell.ClearState();
+        SecondCell.ClearState();
+
+        FirstCell = null;
+        SecondCell = null;
 
         CheckGameSequence();
     }
@@ -75,49 +113,36 @@ public class FieldManager : MonoBehaviour
 public enum MovementType { None = -1, Cross }
 public abstract class BaseMovingRule
 {
-    public BaseCell FirstCell { get; protected set; } = null;
-    public BaseCell SecondCell { get; protected set; } = null;
+    private FieldManager _fieldManager = null;
+
+    protected BaseCell _firstCell => _fieldManager.FirstCell;
+    protected BaseCell _secondCell => _fieldManager.SecondCell;
+
+    public virtual void Initialize(FieldManager manager)
+    {
+        _fieldManager = manager;
+    }
 
     public virtual bool IsPair(BaseCell cell)
     {
-        if (cell.State == CellState.Blocked)
-        {
-            RemoveData();
+        bool result = false;
+
+        if (_secondCell == null)
             return false;
-        }
 
-        if (FirstCell == null)
-        {
-            FirstCell = cell;
+        if (_firstCell != _secondCell || BothCellsAreNotFree())
+            result = true;
 
-            return false;
-        }
-        else if (SecondCell == null)
-        {
-            SecondCell = cell;
-        }
 
-        if (FirstCell == SecondCell || BothCellsAreFree())
-            RemoveData();
-
-        if (FirstCell != null && SecondCell != null)
-            return true;
-
-        return false;
+        return result;
     }
 
-    private bool BothCellsAreFree()
+    private bool BothCellsAreNotFree()
     {
-        return FirstCell.State == CellState.Free && SecondCell.State == CellState.Free;
+        return _firstCell.State != CellState.Free && _secondCell.State != CellState.Free;
     }
 
     public abstract bool IsPositionCorrect();
-
-    public virtual void RemoveData()
-    {
-        FirstCell = null;
-        SecondCell = null;
-    }
 }
 
 public class CrossRule : BaseMovingRule
@@ -128,26 +153,23 @@ public class CrossRule : BaseMovingRule
     {
         bool result = false;
 
-        if (IsHorizontalAxis() && IsCoordsEqualBy(FirstCell.Y, SecondCell.Y))
+        if (IsHorizontalAxis() && IsCoordsEqualBy(_firstCell.Y, _secondCell.Y))
             result = true;
 
-        if (IsVerticalAxis() && IsCoordsEqualBy(FirstCell.X, SecondCell.X))
+        if (IsVerticalAxis() && IsCoordsEqualBy(_firstCell.X, _secondCell.X))
             result = true;
-
-        if(result == false)
-            RemoveData();
 
         return result;
     }
 
     private bool IsHorizontalAxis()
     {
-        return FirstCell.X + OFFSET == SecondCell.X || FirstCell.X - OFFSET == SecondCell.X;
+        return _firstCell.X + OFFSET == _secondCell.X || _firstCell.X - OFFSET == _secondCell.X;
     }
 
     private bool IsVerticalAxis()
     {
-        return FirstCell.Y + OFFSET == SecondCell.Y || FirstCell.Y - OFFSET == SecondCell.Y;
+        return _firstCell.Y + OFFSET == _secondCell.Y || _firstCell.Y - OFFSET == _secondCell.Y;
     }
 
     private bool IsCoordsEqualBy(int fCoord, int sCoord)

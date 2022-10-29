@@ -10,8 +10,7 @@ public class BaseCell : MonoBehaviour
     [SerializeField] private MeshRenderer _meshRenderer;
     [SerializeField] private BaseMechanic[] _mechanics;
 
-    //[TODO] Rename
-    public event Action OnSome;
+    public event Action OnStateCleared;
 
     #region Public properties
     public CellState State { get; private set; } = CellState.None;
@@ -88,15 +87,19 @@ public class BaseCell : MonoBehaviour
             Choised = true;
         }
 
+        _fieldManager.AddCell(this);
         _fieldManager.MoveItem(this);
     }
 
-    //[TODO] Rename
-    public void SetEmptyState()
+    public void ClearState()
     {
         Choised = false;
-        Item.Decrease();
 
-        OnSome?.Invoke();
+        if (Item)
+        {
+            Item.Decrease();
+
+            OnStateCleared?.Invoke();
+        }
     }
 }

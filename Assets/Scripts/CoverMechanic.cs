@@ -12,7 +12,7 @@ public class CoverMechanic : BaseCellMechanic
     {
         base.Initialize(entity);
 
-        _cell.OnSome += OnSomeMeth;
+        _cell.OnStateCleared += ClearMechanicState;
     }
 
     private void OnMouseOver() => ProcessCover();
@@ -39,10 +39,11 @@ public class CoverMechanic : BaseCellMechanic
         }
     }
 
-    private void OnSomeMeth() => IsCover = false;
+    //[TODO] Rename
+    private void ClearMechanicState() => IsCover = false;
     private void OnDisable()
     {
         if(_cell)
-            _cell.OnSome -= OnSomeMeth;
+            _cell.OnStateCleared -= ClearMechanicState;
     }
 }
