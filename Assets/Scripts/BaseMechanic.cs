@@ -5,6 +5,8 @@ using UnityEngine;
 public abstract class BaseMechanic : MonoBehaviour
 {
     public abstract void Initialize(Component entity);
+
+    public virtual void Complete() { }
 }
 
 public class BaseCellMechanic : BaseMechanic

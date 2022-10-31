@@ -47,15 +47,17 @@ public class BaseItem : MonoBehaviour, IScalable
 
     public void Increase() => OnIncreaseEvent?.Invoke();
     public void Decrease() => OnDecreaseEvent?.Invoke();
-}
 
-public interface IScalable
-{
-    event Action OnIncreaseEvent;
-    event Action OnDecreaseEvent;
+    public void CompleteExecution()
+    {
+        CompleteMechanics();
 
-    float CurrentScale { get; }
+        Destroy(gameObject);
+    }
 
-    void Increase();
-    void Decrease();
+    private void CompleteMechanics()
+    {
+        foreach (var mechanic in _mechanics)
+            mechanic.Complete();
+    }
 }

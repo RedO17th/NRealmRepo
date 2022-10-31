@@ -64,15 +64,17 @@ public class ScaleMechanic : BaseItemMechanic
         pastTime = 0;
     }
 
-    private void OnDisable()
+    public override void Complete()
     {
-        if(_scaleRoutine != null)
+        if (_scaleRoutine != null)
             StopCoroutine(_scaleRoutine);
 
         if (_item)
-        { 
+        {
             _item.OnIncreaseEvent -= Increase;
-            _item.OnDecreaseEvent -= Decrease;            
+            _item.OnDecreaseEvent -= Decrease;
+
+            _item = null;
         }
     }
 }

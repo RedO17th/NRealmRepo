@@ -102,4 +102,22 @@ public class BaseCell : MonoBehaviour
             OnStateCleared?.Invoke();
         }
     }
+
+    public void CompleteExecution()
+    {
+        Item?.CompleteExecution();
+        Item = null;
+
+        CompleteMechanics();
+
+        _fieldManager = null;
+
+        Destroy(gameObject);
+    }
+
+    private void CompleteMechanics()
+    {
+        foreach (var mechanic in _mechanics)
+            mechanic?.Complete();
+    }
 }

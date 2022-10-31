@@ -20,8 +20,6 @@ public class CoverMechanic : BaseCellMechanic
     {
         if (IsCover == false)
         {
-            Debug.Log($"CoverMechanic.ProcessCover()");
-
             IsCover = true;
 
             _item?.Increase();
@@ -39,11 +37,13 @@ public class CoverMechanic : BaseCellMechanic
         }
     }
 
-    //[TODO] Rename
     private void ClearMechanicState() => IsCover = false;
-    private void OnDisable()
+
+    public override void Complete()
     {
-        if(_cell)
+        if (_cell)
             _cell.OnStateCleared -= ClearMechanicState;
+
+        _cell = null;
     }
 }

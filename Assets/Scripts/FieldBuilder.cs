@@ -29,12 +29,12 @@ public class FieldBuilder : MonoBehaviour
     private const int FIELDORDER = 5;
     private const int AMOUNTBLOCKED = 6;
 
-    private BaseCell[,] _cells = new BaseCell[FIELDORDER, FIELDORDER];
+    public BaseCell[,] _cells = new BaseCell[FIELDORDER, FIELDORDER];
 
     private List<ColorByType> _temporaryColorsByType = new List<ColorByType>();
     private List<BaseCell> _unPlayableTemporaryCells = new List<BaseCell>();
 
-    private List<BaseCell> _gameCellSequence = new List<BaseCell>();
+    public List<BaseCell> _gameCellSequence = new List<BaseCell>();
 
     public void Initialize(FieldManager manager)
     {
@@ -205,6 +205,33 @@ public class FieldBuilder : MonoBehaviour
     public bool IsTheFieldAssembledCorrectly()
     {
         return _gameCellSequence.FirstOrDefault(cell => cell.MatchesByType == false) ? false : true;
+    }
+
+    public void CompleteExecution()
+    {
+        ClearTemporaryList(_temporaryColorsByType);
+        ClearTemporaryList(_unPlayableTemporaryCells);
+
+        ClearBaseCells();
+
+        _gameCellSequence.Clear();
+    }
+
+    private void ClearTemporaryList<T>(List<T> list)
+    {
+        if (list.Count != 0)
+            list.Clear();
+
+        list = null;
+    }
+
+    private void ClearBaseCells()
+    {
+        foreach (var cell in _cells)
+            cell.CompleteExecution();
+
+        Array.Clear(_cells, 0, _cells.Length);
+        _cells = null;
     }
 
 }
