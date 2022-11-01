@@ -5,7 +5,7 @@ using UnityEngine;
 
 public enum CellType { None = -1, First, Second, Third }
 
-public class FieldManager : MonoBehaviour
+public class FieldManager : BaseManager
 {
     [SerializeField] private MovementType _typeOfMovementRule = MovementType.None;
 
@@ -30,19 +30,19 @@ public class FieldManager : MonoBehaviour
             { MovementType.None, null },
             { MovementType.Cross, new CrossRule() }
         };
-    }
 
-    private void OnEnable()
-    {
         _swapper = new BaseSwapperOfCells();
-        _swapper.Initialize(this);
-
         _currentRule = _rulesByType[_typeOfMovementRule];
-        _currentRule.Initialize(this);
-
-        Builder.Initialize(this);
-        Builder.Build();
     }
+
+    public override void Initialize()
+    {
+        Builder.Initialize(this);
+        _swapper.Initialize(this);
+        _currentRule.Initialize(this);
+    }
+
+    public void BuildField() => Builder.Build();
 
     public void AddCell(BaseCell cell)
     {
@@ -108,7 +108,7 @@ public class FieldManager : MonoBehaviour
 
     private void OnDisable()
     {
-        Builder.CompleteExecution();
+        Builder?.CompleteExecution();
         Builder = null;
 
         _currentRule = null;
