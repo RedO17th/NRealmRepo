@@ -1,19 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public abstract class BaseManager : MonoBehaviour
-{
-    public abstract void Initialize();
-}
+public enum WindowType { None = -1, Win }
 
 public class UIManager : BaseManager
 {
     [SerializeField] private BaseWindow[] _windows;
 
-    public override void Initialize()
+    private FieldManager _fieldManager = null;
+
+    public override void Initialize(HeadSceneManager manager)
     {
+        base.Initialize(manager);
+
         InitializeWindows();
+
+        SetTheEventToEndTheGame();
+    }
+
+    private void SetTheEventToEndTheGame()
+    {
+        _fieldManager = _sceneManager.GetManagerBy(ManagerType.Field) as FieldManager;
+        _fieldManager.OnFieldWasAssembled += ActivateWindowByEndGame;
     }
 
     private void InitializeWindows()
@@ -25,15 +35,40 @@ public class UIManager : BaseManager
         }
     }
 
-    [ContextMenu("Enable WinWindow")]
-    private void Enable()
+    private void ActivateWindowByEndGame()
     {
-        _windows[0].Activate();
+        var window = GetWindowBy(WindowType.Win);
+            window?.Activate();
+    }
+
+    private BaseWindow GetWindowBy(WindowType type)
+    {
+        return _windows.FirstOrDefault(w => w.Type == type);
+    }
+
+    public override void CompleteExecution()
+    {
+        ProcessWindowsDeactivation();
+
+        if (_fieldManager)
+            _fieldManager.OnFieldWasAssembled -= ActivateWindowByEndGame;
+        
+        _fieldManager = null;
+    }
+
+    private void ProcessWindowsDeactivation()
+    {
+        foreach (var window in _windows)
+            window.Deactivate();
     }
 }
 
 public class BaseWindow : MonoBehaviour
 {
+    [SerializeField] private WindowType _type;
+
+    public WindowType Type => _type;
+
     private UIManager uiManager = null;
 
     public virtual void Initialize(UIManager manager) 

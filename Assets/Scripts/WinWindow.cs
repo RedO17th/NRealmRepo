@@ -52,7 +52,10 @@ public class WinWindow : BaseWindow
     protected override void ProcessWindowDeactivation()
     {
         if (_activationRoutine != null)
+        {
+            _tapSound.Stop();
             StopCoroutine(_activationRoutine);
+        }
 
         _headerTextComponent.text = string.Empty;
     }

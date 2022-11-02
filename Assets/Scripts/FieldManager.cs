@@ -25,18 +25,25 @@ public class FieldManager : BaseManager
     {
         Builder = GetComponent<FieldBuilder>();
 
-        _rulesByType = new Dictionary<MovementType, BaseMovingRule>()
-        {
-            { MovementType.None, null },
-            { MovementType.Cross, new CrossRule() }
-        };
+        InitializeDictionaryOfRules();
 
         _swapper = new BaseSwapperOfCells();
         _currentRule = _rulesByType[_typeOfMovementRule];
     }
 
-    public override void Initialize()
+    private void InitializeDictionaryOfRules()
     {
+        _rulesByType = new Dictionary<MovementType, BaseMovingRule>()
+        {
+            { MovementType.None, null },
+            { MovementType.Cross, new CrossRule() }
+        };
+    }
+
+    public override void Initialize(HeadSceneManager manager)
+    {
+        base.Initialize(manager);
+
         Builder.Initialize(this);
         _swapper.Initialize(this);
         _currentRule.Initialize(this);
@@ -103,10 +110,14 @@ public class FieldManager : BaseManager
     private void CheckGameSequence()
     {
         if (Builder.IsTheFieldAssembledCorrectly())
+        {
+            Builder.DisableField();
+
             OnFieldWasAssembled?.Invoke();
+        }
     }
 
-    private void OnDisable()
+    public override void CompleteExecution()
     {
         Builder?.CompleteExecution();
         Builder = null;
@@ -117,6 +128,6 @@ public class FieldManager : BaseManager
         _rulesByType.Clear();
 
         FirstCell = null;
-        SecondCell = null;
+        SecondCell = null;        
     }
 }

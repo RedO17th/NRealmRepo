@@ -31,10 +31,10 @@ public class FieldBuilder : MonoBehaviour
 
     public BaseCell[,] _cells = new BaseCell[FIELDORDER, FIELDORDER];
 
+    private List<BaseCell> _gameCellSequence = new List<BaseCell>();
+
     private List<ColorByType> _temporaryColorsByType = new List<ColorByType>();
     private List<BaseCell> _unPlayableTemporaryCells = new List<BaseCell>();
-
-    public List<BaseCell> _gameCellSequence = new List<BaseCell>();
 
     public void Initialize(FieldManager manager)
     {
@@ -50,6 +50,8 @@ public class FieldBuilder : MonoBehaviour
         InitializeFreeCells();
         InitializeBusyCells();
     }
+
+    #region BuildField
 
     private void BuildField()
     {
@@ -207,6 +209,16 @@ public class FieldBuilder : MonoBehaviour
         return _gameCellSequence.FirstOrDefault(cell => cell.MatchesByType == false) ? false : true;
     }
 
+    #endregion
+
+    public void DisableField()
+    {
+        foreach (var cell in _cells)
+            cell.DisableClickMechanic();
+    }
+
+    #region CompleteExecution
+
     public void CompleteExecution()
     {
         ClearTemporaryList(_temporaryColorsByType);
@@ -234,6 +246,7 @@ public class FieldBuilder : MonoBehaviour
         _cells = null;
     }
 
+    #endregion
 }
 
 [System.Serializable]

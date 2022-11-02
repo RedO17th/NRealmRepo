@@ -431,6 +431,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b74a56c74c9604478d5150f0abc0825, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _managerType: 1
   _windows:
   - {fileID: 693332265}
 --- !u!1 &499701788
@@ -593,6 +594,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd2e797aa271e7c4baaf5b6279b892ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _type: 0
   _headerText: WIN
   _headerTextComponent: {fileID: 2100511915}
   _minTapTime: 0.2
@@ -1114,6 +1116,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64514116d07f1b24098c4bed8ca3668d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _managers:
+  - {fileID: 438941975}
+  - {fileID: 1711345325}
   _fieldManager: {fileID: 1711345325}
   _uiManager: {fileID: 438941975}
 --- !u!1 &1711345323
@@ -1165,6 +1170,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d03eba85828f5e4fa51cbea460de14e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _managerType: 0
   _typeOfMovementRule: 0
 --- !u!114 &1711345326
 MonoBehaviour:

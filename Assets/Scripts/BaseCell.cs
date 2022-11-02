@@ -8,6 +8,7 @@ public enum CellState { None = -1, Blocked, Free, Busy }
 public class BaseCell : MonoBehaviour
 {
     [SerializeField] private MeshRenderer _meshRenderer;
+    [SerializeField] private Collider _collider;
     [SerializeField] private BaseMechanic[] _mechanics;
 
     public event Action OnStateCleared;
@@ -24,7 +25,7 @@ public class BaseCell : MonoBehaviour
     public int X => (int)transform.position.x;
     public int Y => (int)transform.position.z;
 
-    public bool Choised = false;
+    public bool Choised { get; private set; } = false;
     #endregion
 
     private FieldManager _fieldManager = null;
@@ -79,7 +80,8 @@ public class BaseCell : MonoBehaviour
         _meshRenderer.material = material;
     }
 
-    private void OnMouseDown()
+    private void OnMouseDown() => ProcessClick();
+    private void ProcessClick()
     {
         if (Item && Choised == false)
         {
@@ -101,6 +103,11 @@ public class BaseCell : MonoBehaviour
 
             OnStateCleared?.Invoke();
         }
+    }
+
+    public void DisableClickMechanic()
+    {
+        _collider.enabled = false;
     }
 
     public void CompleteExecution()

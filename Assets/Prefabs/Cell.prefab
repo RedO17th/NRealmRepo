@@ -64,8 +64,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _meshRenderer: {fileID: 2195913758786444328}
+  _collider: {fileID: 1865062346440104688}
   _mechanics:
   - {fileID: -5639309318217176726}
+  Choised: 0
 --- !u!114 &-5639309318217176726
 MonoBehaviour:
   m_ObjectHideFlags: 0
