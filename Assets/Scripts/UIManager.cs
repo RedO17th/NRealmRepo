@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,13 +39,33 @@ public class UIManager : BaseManager
     private void ActivateWindowByEndGame()
     {
         var window = GetWindowBy(WindowType.Win);
-            window?.Activate();
+
+        if (window)
+        {
+            window.Activate();
+            window.OnActivated += ProcessWindowActivation;
+        }
     }
 
     private BaseWindow GetWindowBy(WindowType type)
     {
         return _windows.FirstOrDefault(w => w.Type == type);
     }
+
+    //[TODO] Refactoring
+    private void ProcessWindowActivation(WindowType type)
+    {
+        switch (type)
+        {
+            case WindowType.Win: { ProcessWinWindowActivation(); break; }
+        }
+    }
+
+    private void ProcessWinWindowActivation()
+    {
+        //
+    }
+    //
 
     public override void CompleteExecution()
     {
@@ -65,15 +86,17 @@ public class UIManager : BaseManager
 
 public class BaseWindow : MonoBehaviour
 {
-    [SerializeField] private WindowType _type;
+    [SerializeField] protected WindowType _type;
+
+    public virtual event Action<WindowType> OnActivated;
 
     public WindowType Type => _type;
 
-    private UIManager uiManager = null;
+    private UIManager _uiManager = null;
 
     public virtual void Initialize(UIManager manager) 
     {
-        uiManager = manager;
+        _uiManager = manager;
     }
 
     public virtual void Activate() => gameObject.SetActive(true);
