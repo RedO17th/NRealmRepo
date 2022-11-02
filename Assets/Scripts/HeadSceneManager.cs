@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
+
 public class HeadSceneManager : MonoBehaviour
 {
     [SerializeField] private BaseManager[] _managers;
 
-    private void Awake()
-    {
-        //
-    }
+    private UIManager _uiManager = null;
 
     private void Start()
     {
         InitializeManagers();
         InitializeGameField();
+        SetAnEventToEndTheGame();
     }
 
     private void InitializeManagers()
@@ -30,15 +30,31 @@ public class HeadSceneManager : MonoBehaviour
             manager?.BuildField();
     }
 
+    private void SetAnEventToEndTheGame()
+    {
+        _uiManager = GetManagerBy(ManagerType.UI) as UIManager;
+        _uiManager.OnResultWindowWasShowed += ProcessLevelCompletion;
+    }
+
     public BaseManager GetManagerBy(ManagerType type)
     {
         return _managers.FirstOrDefault(m => m.Type == type);
     }
 
-    private void OnDisable()
+    private void ProcessLevelCompletion()
+    {
+        CompleteExecutionOfManagers();
+
+        UnitySceneManager.LoadScene(UnitySceneManager.GetActiveScene().buildIndex);
+    }
+
+    private void CompleteExecutionOfManagers()
     {
         foreach (var m in _managers)
             m.CompleteExecution();
+
+        _uiManager.OnResultWindowWasShowed -= ProcessLevelCompletion;
+        _uiManager = null;
     }
 }
 

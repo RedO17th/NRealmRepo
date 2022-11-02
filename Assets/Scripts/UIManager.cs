@@ -10,6 +10,8 @@ public class UIManager : BaseManager
 {
     [SerializeField] private BaseWindow[] _windows;
 
+    public event Action OnResultWindowWasShowed;
+
     private FieldManager _fieldManager = null;
 
     public override void Initialize(HeadSceneManager manager)
@@ -52,20 +54,18 @@ public class UIManager : BaseManager
         return _windows.FirstOrDefault(w => w.Type == type);
     }
 
-    //[TODO] Refactoring
     private void ProcessWindowActivation(WindowType type)
     {
         switch (type)
         {
-            case WindowType.Win: { ProcessWinWindowActivation(); break; }
+            case WindowType.Win: { ProcessingWinWindowActivation(); break; }
         }
     }
 
-    private void ProcessWinWindowActivation()
+    private void ProcessingWinWindowActivation()
     {
-        //
+        OnResultWindowWasShowed?.Invoke();
     }
-    //
 
     public override void CompleteExecution()
     {
@@ -80,7 +80,14 @@ public class UIManager : BaseManager
     private void ProcessWindowsDeactivation()
     {
         foreach (var window in _windows)
-            window.Deactivate();
+        {
+            if (window)
+            {
+                window.OnActivated -= ProcessWindowActivation;
+                window.Deactivate();
+            }
+        }
+            
     }
 }
 
