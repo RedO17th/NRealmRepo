@@ -21,7 +21,7 @@ public class BaseItem : MonoBehaviour, IScalable
         SetMaterial(material);
         PutIn(container);
 
-        InitializeMechanics();
+        InitializeAndActivateMechanics();
     }
 
     private void SetMaterial(Material material)
@@ -34,10 +34,13 @@ public class BaseItem : MonoBehaviour, IScalable
         transform.parent = container;
     }
 
-    private void InitializeMechanics()
+    private void InitializeAndActivateMechanics()
     {
         foreach (var mechanic in _mechanics)
-            mechanic.Initialize(this);
+        { 
+            mechanic?.Initialize(this);
+            mechanic?.Activate();
+        }
     }
    
     public void SetPosition(Vector3 position)
@@ -58,6 +61,6 @@ public class BaseItem : MonoBehaviour, IScalable
     private void CompleteMechanics()
     {
         foreach (var mechanic in _mechanics)
-            mechanic.Complete();
+            mechanic?.Deactivate();
     }
 }

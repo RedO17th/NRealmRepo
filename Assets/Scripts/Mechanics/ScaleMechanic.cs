@@ -22,7 +22,10 @@ public class ScaleMechanic : BaseItemMechanic
         base.Initialize(entity);
 
         _standartScale = _item.CurrentScale;
+    }
 
+    public override void Activate()
+    {
         _item.OnIncreaseEvent += Increase;
         _item.OnDecreaseEvent += Decrease;
     }
@@ -64,17 +67,17 @@ public class ScaleMechanic : BaseItemMechanic
         pastTime = 0;
     }
 
-    public override void Complete()
+    public override void Deactivate()
     {
-        if (_scaleRoutine != null)
-            StopCoroutine(_scaleRoutine);
-
         if (_item)
         {
             _item.OnIncreaseEvent -= Increase;
             _item.OnDecreaseEvent -= Decrease;
-
-            _item = null;
         }
+
+        if (_scaleRoutine != null)
+            StopCoroutine(_scaleRoutine);
+
+        _item = null;
     }
 }

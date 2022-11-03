@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public enum CellState { None = -1, Blocked, Free, Busy }
@@ -9,7 +10,7 @@ public class BaseCell : MonoBehaviour
 {
     [SerializeField] private MeshRenderer _meshRenderer;
     [SerializeField] private Collider _collider;
-    [SerializeField] private BaseMechanic[] _mechanics;
+    [SerializeField] private BaseCellMechanic[] _mechanics;
 
     public event Action OnStateCleared;
 
@@ -17,6 +18,7 @@ public class BaseCell : MonoBehaviour
     public CellState State { get; private set; } = CellState.None;
     public CellType Type { get; private set; } = CellType.None;
 
+    public FieldManager FieldManager { get; private set; } = null;
     public BaseItem Item { get; private set; } = null;
     public bool MatchesByType { get; private set; } = false;
 
@@ -28,25 +30,29 @@ public class BaseCell : MonoBehaviour
     public bool Choised { get; private set; } = false;
     #endregion
 
-    private FieldManager _fieldManager = null;
 
     public void Initialize(FieldManager manager)
     {
-        _fieldManager = manager;
+        FieldManager = manager;
 
-        InitializeMechanics();
+        InitializeAndActivateMechanics();
     }
 
-    private void InitializeMechanics()
+    private void InitializeAndActivateMechanics()
     {
         foreach (var mechanic in _mechanics)
+        { 
             mechanic.Initialize(this);
+            mechanic.Activate();
+        }
     }
 
     public void PutIn(Transform container)
     {
         transform.parent = container;
     }
+
+    #region Set methods
 
     public void SetState(CellState state) => State = state;
 
@@ -56,7 +62,7 @@ public class BaseCell : MonoBehaviour
 
         if (Item != null)
         { 
-            float yPosition = Position.y + _fieldManager.Builder.YOffsetPosition;
+            float yPosition = Position.y + FieldManager.Builder.YOffsetPosition;
             Item.SetPosition(new Vector3(Position.x, yPosition, Position.z)); 
         }
 
@@ -80,23 +86,15 @@ public class BaseCell : MonoBehaviour
         _meshRenderer.material = material;
     }
 
-    private void OnMouseDown() => ProcessClick();
-    private void ProcessClick()
-    {
-        if (Item && Choised == false)
-        {
-            Item.Increase();
-            Choised = true;
-        }
+    #endregion
 
-        _fieldManager.AddCell(this);
-        _fieldManager.MoveItem(this);
+    public BaseCellMechanic GetMechanicBy(CellMechanicType type)
+    {
+        return _mechanics.FirstOrDefault(m => m.Type == type);
     }
 
     public void ClearState()
     {
-        Choised = false;
-
         if (Item)
         {
             Item.Decrease();
@@ -105,10 +103,12 @@ public class BaseCell : MonoBehaviour
         }
     }
 
+    //[TODO] ReWrite functional with ClickMechanic
     public void DisableClickMechanic()
     {
         _collider.enabled = false;
     }
+    //..
 
     public void CompleteExecution()
     {
@@ -117,7 +117,7 @@ public class BaseCell : MonoBehaviour
 
         CompleteMechanics();
 
-        _fieldManager = null;
+        FieldManager = null;
 
         Destroy(gameObject);
     }
@@ -125,6 +125,6 @@ public class BaseCell : MonoBehaviour
     private void CompleteMechanics()
     {
         foreach (var mechanic in _mechanics)
-            mechanic?.Complete();
+            mechanic?.Deactivate();
     }
 }

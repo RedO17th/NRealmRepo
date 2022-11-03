@@ -4,23 +4,29 @@ using UnityEngine;
 
 public class CoverMechanic : BaseCellMechanic
 {
-    private bool IsCover = false;
+    private bool _isCover = false;
 
+    private ClickMechanic _clickMechanic = null;
     private IScalable _item => _cell.Item;
 
-    public override void Initialize(Component entity)
+    public override void Activate()
     {
-        base.Initialize(entity);
-
         _cell.OnStateCleared += ClearMechanicState;
+
+        GetNecessaryComponents();
+    }
+
+    private void GetNecessaryComponents()
+    {
+        _clickMechanic = _cell.GetMechanicBy(CellMechanicType.Click) as ClickMechanic;
     }
 
     private void OnMouseOver() => ProcessCover();
     private void ProcessCover()
     {
-        if (IsCover == false)
+        if (_isCover == false)
         {
-            IsCover = true;
+            _isCover = true;
 
             _item?.Increase();
         }
@@ -29,21 +35,22 @@ public class CoverMechanic : BaseCellMechanic
     private void OnMouseExit() => ProcessUnCover();
     private void ProcessUnCover()
     {
-        if (IsCover && _cell.Choised == false)
+        if (_isCover && _clickMechanic.Choised == false)
         {
-            IsCover = false;
+            _isCover = false;
 
             _item?.Decrease();
         }
     }
 
-    private void ClearMechanicState() => IsCover = false;
+    protected override void ClearMechanicState() => _isCover = false;
 
-    public override void Complete()
+    public override void Deactivate()
     {
         if (_cell)
             _cell.OnStateCleared -= ClearMechanicState;
 
+        _clickMechanic = null;
         _cell = null;
     }
 }
