@@ -62,10 +62,7 @@ public class UIManager : BaseManager
         }
     }
 
-    private void ProcessingWinWindowActivation()
-    {
-        OnResultWindowWasShowed?.Invoke();
-    }
+    private void ProcessingWinWindowActivation() => OnResultWindowWasShowed?.Invoke();
 
     public override void CompleteExecution()
     {

@@ -15,7 +15,7 @@ public class HeadSceneManager : MonoBehaviour
     {
         InitializeManagers();
         InitializeGameField();
-        SetAnEventToEndTheGame();
+        SetResultWindowTracking();
     }
 
     private void InitializeManagers()
@@ -30,7 +30,7 @@ public class HeadSceneManager : MonoBehaviour
             manager?.BuildField();
     }
 
-    private void SetAnEventToEndTheGame()
+    private void SetResultWindowTracking()
     {
         _uiManager = GetManagerBy(ManagerType.UI) as UIManager;
         _uiManager.OnResultWindowWasShowed += ProcessLevelCompletion;
