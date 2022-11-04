@@ -214,7 +214,7 @@ public class FieldBuilder : MonoBehaviour
     public void DisableField()
     {
         foreach (var cell in _cells)
-            cell.DisableClickMechanic();
+            cell.DisableInteraction();
     }
 
     #region CompleteExecution

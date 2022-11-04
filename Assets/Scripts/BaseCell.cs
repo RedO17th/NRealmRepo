@@ -30,7 +30,6 @@ public class BaseCell : MonoBehaviour
     public bool Choised { get; private set; } = false;
     #endregion
 
-
     public void Initialize(FieldManager manager)
     {
         FieldManager = manager;
@@ -93,6 +92,11 @@ public class BaseCell : MonoBehaviour
         return _mechanics.FirstOrDefault(m => m.Type == type);
     }
 
+    public void DisableInteraction()
+    {
+        _collider.enabled = false;
+    }
+
     public void ClearState()
     {
         if (Item)
@@ -103,12 +107,7 @@ public class BaseCell : MonoBehaviour
         }
     }
 
-    //[TODO] ReWrite functional with ClickMechanic
-    public void DisableClickMechanic()
-    {
-        _collider.enabled = false;
-    }
-    //..
+
 
     public void CompleteExecution()
     {
