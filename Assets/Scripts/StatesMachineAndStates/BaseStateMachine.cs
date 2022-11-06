@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,23 +6,19 @@ namespace Functional.MashineState
 {
     public enum StateType { None = -1, Idle }
 
-    public class BaseStateMachine : MonoBehaviour
+    public abstract class BaseStateMachine : MonoBehaviour
     {
         [SerializeField] private StateType _startState = StateType.None;
 
-        private List<BaseState> _states = null;
+        protected List<BaseState> _states = null;
 
-        private BaseState _currentState = null;
-        private StateType _newState = StateType.None;
+        protected BaseState _currentState = null;
+        protected StateType _newState = StateType.None;
 
-        private void Awake()
-        {
-            _states = new List<BaseState>()
-            {
-                new BaseState(StateType.None, this),
-                new IdleState(StateType.Idle, this)
-            };
-        }
+        protected virtual void Awake() => InitializeStates();
+        protected abstract void InitializeStates();
+
+        public abstract void Initialize(Component manager);
 
         private void Start() => SetStartState();
         protected virtual void SetStartState()
