@@ -15,7 +15,8 @@ public class HeadSceneManager : MonoBehaviour
     {
         InitializeManagers();
         InitializeGameField();
-        SetResultWindowTracking();
+
+        SetNecessaryEventsFromUIManager();
     }
 
     private void InitializeManagers()
@@ -30,10 +31,11 @@ public class HeadSceneManager : MonoBehaviour
             manager?.BuildField();
     }
 
-    private void SetResultWindowTracking()
+    private void SetNecessaryEventsFromUIManager()
     {
         _uiManager = GetManagerBy(ManagerType.UI) as UIManager;
         _uiManager.OnResultWindowWasShowed += ProcessLevelCompletion;
+        _uiManager.OnOutputEvent += ProcessingTheExitFromTheApplication;
     }
 
     public BaseManager GetManagerBy(ManagerType type)
@@ -54,7 +56,20 @@ public class HeadSceneManager : MonoBehaviour
             m.CompleteExecution();
 
         _uiManager.OnResultWindowWasShowed -= ProcessLevelCompletion;
+        _uiManager.OnOutputEvent -= ProcessingTheExitFromTheApplication;
         _uiManager = null;
+    }
+
+    private void ProcessingTheExitFromTheApplication()
+    {
+        CompleteExecutionOfManagers();
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+
     }
 }
 

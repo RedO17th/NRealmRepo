@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public enum WindowType { None = -1, Win }
+public enum WindowType { None = -1, Win, Gameplay }
 
 public class UIManager : BaseManager
 {
     [SerializeField] private BaseWindow[] _windows;
 
     public event Action OnResultWindowWasShowed;
+    public event Action OnOutputEvent;
 
     private FieldManager _fieldManager = null;
 
@@ -21,12 +22,8 @@ public class UIManager : BaseManager
         InitializeWindows();
 
         SetTheEventToEndTheGame();
-    }
 
-    private void SetTheEventToEndTheGame()
-    {
-        _fieldManager = _sceneManager.GetManagerBy(ManagerType.Field) as FieldManager;
-        _fieldManager.OnFieldWasAssembled += ActivateWindowByEndGame;
+        EnableGamePlayWindow();
     }
 
     private void InitializeWindows()
@@ -36,6 +33,18 @@ public class UIManager : BaseManager
             window.Initialize(this);
             window.Deactivate();
         }
+    }
+
+    private void SetTheEventToEndTheGame()
+    {
+        _fieldManager = _sceneManager.GetManagerBy(ManagerType.Field) as FieldManager;
+        _fieldManager.OnFieldWasAssembled += ActivateWindowByEndGame;
+    }
+
+    private void EnableGamePlayWindow()
+    {
+        var window = GetWindowBy(WindowType.Gameplay);
+            window.Activate();
     }
 
     private void ActivateWindowByEndGame()
@@ -83,9 +92,10 @@ public class UIManager : BaseManager
                 window.OnActivated -= ProcessWindowActivation;
                 window.Deactivate();
             }
-        }
-            
+        }  
     }
+
+    public void ProcessingExitEvent() => OnOutputEvent?.Invoke();
 }
 
 public class BaseWindow : MonoBehaviour
@@ -96,7 +106,7 @@ public class BaseWindow : MonoBehaviour
 
     public WindowType Type => _type;
 
-    private UIManager _uiManager = null;
+    protected UIManager _uiManager = null;
 
     public virtual void Initialize(UIManager manager) 
     {
