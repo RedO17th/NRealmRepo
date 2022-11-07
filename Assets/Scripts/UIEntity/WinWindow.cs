@@ -22,10 +22,6 @@ public class WinWindow : BaseWindow
 
     #endregion
 
-    public override event Action<WindowType> OnActivated;
-
-    private Coroutine _activationRoutine = null;
-
     private AudioSource _tapSound = null;
 
     public override void Initialize(UIManager manager)
@@ -43,7 +39,14 @@ public class WinWindow : BaseWindow
     protected override void ProcessWindowActivation() => ActivationMechanics();
     private void ActivationMechanics()
     {
-        _activationRoutine = StartCoroutine(Activation());
+        StartCoroutine(ActivateWindow());
+    }
+
+    private IEnumerator ActivateWindow()
+    {
+        yield return StartCoroutine(Activation());
+
+        _uiManager.ProcessingWinWindowActivation();
     }
 
     private IEnumerator Activation()
@@ -59,17 +62,11 @@ public class WinWindow : BaseWindow
         }
 
         yield return new WaitForSeconds(_delayTime);
-
-        OnActivated?.Invoke(_type);
     }
 
     protected override void ProcessWindowDeactivation()
     {
-        if (_activationRoutine != null)
-        {
-            _tapSound.Stop();
-            StopCoroutine(_activationRoutine);
-        }
+        _tapSound?.Stop();
 
         _headerTextComponent.text = string.Empty;
     }

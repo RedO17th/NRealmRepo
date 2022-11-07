@@ -44,18 +44,13 @@ public class UIManager : BaseManager
     private void EnableGamePlayWindow()
     {
         var window = GetWindowBy(WindowType.Gameplay);
-            window.Activate();
+            window?.Activate();
     }
 
     private void ActivateWindowByEndGame()
     {
         var window = GetWindowBy(WindowType.Win);
-
-        if (window)
-        {
-            window.Activate();
-            window.OnActivated += ProcessWindowActivation;
-        }
+            window?.Activate();
     }
 
     private BaseWindow GetWindowBy(WindowType type)
@@ -63,15 +58,8 @@ public class UIManager : BaseManager
         return _windows.FirstOrDefault(w => w.Type == type);
     }
 
-    private void ProcessWindowActivation(WindowType type)
-    {
-        switch (type)
-        {
-            case WindowType.Win: { ProcessingWinWindowActivation(); break; }
-        }
-    }
-
-    private void ProcessingWinWindowActivation() => OnResultWindowWasShowed?.Invoke();
+    public void ProcessingWinWindowActivation() => OnResultWindowWasShowed?.Invoke();
+    public void ProcessingExitEvent() => OnOutputEvent?.Invoke();
 
     public override void CompleteExecution()
     {
@@ -86,23 +74,13 @@ public class UIManager : BaseManager
     private void ProcessWindowsDeactivation()
     {
         foreach (var window in _windows)
-        {
-            if (window)
-            {
-                window.OnActivated -= ProcessWindowActivation;
-                window.Deactivate();
-            }
-        }  
+            window?.Deactivate();
     }
-
-    public void ProcessingExitEvent() => OnOutputEvent?.Invoke();
 }
 
 public class BaseWindow : MonoBehaviour
 {
     [SerializeField] protected WindowType _type;
-
-    public virtual event Action<WindowType> OnActivated;
 
     public WindowType Type => _type;
 
